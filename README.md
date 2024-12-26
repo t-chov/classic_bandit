@@ -18,7 +18,7 @@ gem 'classic_bandit'
 
 And then execute:
 
-``bash
+```bash
 $ bundle install
 ```
 
