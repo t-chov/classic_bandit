@@ -1,39 +1,112 @@
 # ClassicBandit
 
-TODO: Delete this and the text below, and describe your gem
+[![CI](https://github.com/t-chov/classic_bandit/actions/workflows/ci.yml/badge.svg)](https://github.com/t-chov/classic_bandit/actions/workflows/ci.yml)
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/classic_bandit`. To experiment with that code, run `bin/console` for an interactive prompt.
+A Ruby library for classic (non-contextual) multi-armed bandit algorithms including Thompson Sampling, UCB1, and Epsilon-Greedy.
+
+## Requirements
+
+- Ruby >= 3.0.0
 
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
+Add this line to your application's Gemfile:
 
-Install the gem and add to the application's Gemfile by executing:
+```ruby
+gem 'classic_bandit'
+```
 
-    $ bundle add UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+And then execute:
 
-If bundler is not being used to manage dependencies, install the gem by executing:
+``bash
+$ bundle install
+```
 
-    $ gem install UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+Or install it yourself as:
+
+```bash
+$ gem install classic_bandit
+```
 
 ## Usage
 
-TODO: Write usage instructions here
+### A/B Testing Example
+
+```ruby
+require 'classic_bandit'
+
+# Initialize banners for A/B testing
+arms = [
+  ClassicBandit::Arm.new(id: 'banner_a', name: 'Spring Campaign'),
+  ClassicBandit::Arm.new(id: 'banner_b', name: 'Summer Campaign')
+]
+
+# Choose algorithm: Epsilon-Greedy with 10% exploration
+bandit = ClassicBandit::EpsilonGreedy.new(arms: arms, epsilon: 0.1)
+
+# In your application
+selected_arm = bandit.select_arm
+# Display the selected banner to user
+show_banner(selected_arm.id)
+
+# Update with user's response
+# 1 for click, 0 for no click
+bandit.update(selected_arm, reward: 1)
+```
+
+## Available Algorithms
+
+### Epsilon-Greedy
+
+Balances exploration and exploitation with a fixed exploration rate.
+
+```ruby
+bandit = ClassicBandit::EpsilonGreedy.new(arms: arms, epsilon: 0.1)
+```
+
+- Simple
+- Explicitly controls exploration with ε parameter
+- Explores randomly with probability ε, exploits best arm with probability 1-ε
+
+### UCB1
+
+Upper Confidence Bound algorithm that automatically balances exploration and exploitation.
+
+```ruby
+bandit = ClassicBandit::Ucb1.new(arms: arms)
+```
+
+- No explicit exploration parameter needed
+- Automatically balances exploration and exploitation
+- Uses confidence bounds to select arms
+- Always tries untested arms first
+
+### Common Interface
+All algorithms share the same interface:
+
+```ruby
+# Select an arm
+arm = bandit.select_arm
+
+# Update the arm with reward
+bandit.update(arm, reward: 1)  # Success
+bandit.update(arm, reward: 0)  # Failure
+```
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+After checking out the repo, run:
+```bash
+$ bundle install
+$ bundle exec rspec
+```
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+To release a new version:
 
-## Contributing
+1. Update the version number in version.rb
+2. Create a git tag for the version
+3. Push git commits and tags
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/classic_bandit. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/classic_bandit/blob/master/CODE_OF_CONDUCT.md).
+### License
 
-## License
-
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
-
-## Code of Conduct
-
-Everyone interacting in the ClassicBandit project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/classic_bandit/blob/master/CODE_OF_CONDUCT.md).
+The gem is available as open source under the terms of the MIT License.
