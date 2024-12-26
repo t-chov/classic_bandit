@@ -37,6 +37,13 @@ RSpec.describe ClassicBandit::EpsilonGreedy do
   describe "#select_arm" do
     let(:bandit) { described_class.new(arms: arms, epsilon: 0.5) }
 
+    context "when no arms have been tried" do
+      it "randomly selects an arm" do
+        expect(arms).to receive(:sample)
+        bandit.select_arm
+      end
+    end
+
     context "when exploring" do
       before do
         allow(bandit).to receive(:rand).and_return(0.1) # Ensures exploration

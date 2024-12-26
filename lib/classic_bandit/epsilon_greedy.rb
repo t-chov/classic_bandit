@@ -26,6 +26,9 @@ module ClassicBandit
     end
 
     def select_arm
+      # If no arms have been tried, do random selection
+      return @arms.sample if @arms.all? { |arm| arm.trials.zero? }
+
       if rand < @epsilon
         # Exploration: random selection
         @arms.sample
