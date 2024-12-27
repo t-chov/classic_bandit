@@ -81,6 +81,36 @@ bandit = ClassicBandit::Ucb1.new(arms: arms)
 - Uses confidence bounds to select arms
 - Always tries untested arms first
 
+### Softmax
+
+Temperature-based algorithm that selects arms according to their relative rewards.
+
+```ruby
+bandit = ClassicBandit::Softmax.new(
+  arms: arms,
+  initial_temperature: 1.0,
+  k: 0.5
+)
+```
+
+- Uses Boltzmann distribution for arm selection
+- Higher temperature leads to more exploration
+- Temperature decreases over time for better exploitation
+- Smooth probability distribution over arms
+
+### Thompson Sampling
+
+Bayesian approach that maintains a probability distribution over each arm's rewards.
+
+```ruby
+bandit = ClassicBandit::ThompsonSampling.new(arms: arms)
+```
+
+- Naturally balances exploration and exploitation
+- Uses Beta distribution to model uncertainty
+- Performs well in practice with no tuning required
+- Adapts quickly to reward patterns
+
 ### Common Interface
 All algorithms share the same interface:
 
@@ -89,8 +119,8 @@ All algorithms share the same interface:
 arm = bandit.select_arm
 
 # Update the arm with reward
-bandit.update(arm, reward: 1)  # Success
-bandit.update(arm, reward: 0)  # Failure
+bandit.update(arm, 1)  # Success
+bandit.update(arm, 0)  # Failure
 ```
 
 ## Development
