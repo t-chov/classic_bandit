@@ -51,7 +51,7 @@ show_banner(selected_arm.id)
 
 # Update with user's response
 # 1 for click, 0 for no click
-bandit.update(selected_arm, reward: 1)
+bandit.update(selected_arm, 1)
 ```
 
 ## Available Algorithms
