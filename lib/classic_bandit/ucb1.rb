@@ -42,10 +42,9 @@ module ClassicBandit
     def ucb_score(arm, total_trials)
       return Float::INFINITY if arm.trials.zero?
 
-      mean_reward = arm.successes.to_f / arm.trials
       exploration_term = Math.sqrt(2 * Math.log(total_trials) / arm.trials)
 
-      mean_reward + exploration_term
+      arm.mean_reward + exploration_term
     end
   end
 end

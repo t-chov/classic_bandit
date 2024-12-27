@@ -34,17 +34,11 @@ module ClassicBandit
         @arms.sample
       else
         # Exploitation: select arm with highest mean reward
-        @arms.max_by { |arm| mean_reward(arm) }
+        @arms.max_by(&:mean_reward)
       end
     end
 
     private
-
-    def mean_reward(arm)
-      return 0 if arm.trials.zero?
-
-      arm.successes.to_f / arm.trials
-    end
 
     def validate_epsilon!
       return if (0..1).cover?(@epsilon)

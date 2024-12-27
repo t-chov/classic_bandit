@@ -79,4 +79,25 @@ RSpec.describe ClassicBandit::Arm do
       expect { arm.name = "new_name" }.to raise_error(NoMethodError)
     end
   end
+
+  describe "#mean_reward" do
+    let(:arm) { described_class.new(id: 1) }
+
+    context "when no trials" do
+      it "returns 0.0" do
+        expect(arm.mean_reward).to eq(0.0)
+      end
+    end
+
+    context "with trials" do
+      before do
+        arm.trials = 10
+        arm.successes = 4
+      end
+
+      it "calculates correct mean reward" do
+        expect(arm.mean_reward).to eq(0.4)
+      end
+    end
+  end
 end

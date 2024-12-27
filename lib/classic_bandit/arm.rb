@@ -19,5 +19,13 @@ module ClassicBandit
       @trials = trials
       @successes = successes
     end
+
+    # Calculate mean reward (success rate) for this arm
+    # @return [Float] Mean reward (0.0 if no trials)
+    def mean_reward
+      return 0.0 if @trials.zero?
+
+      @successes.to_f / @trials
+    end
   end
 end
