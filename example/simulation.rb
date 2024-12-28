@@ -60,13 +60,13 @@ Gnuplot.open do |gp|
     plot.set "style line 2 linecolor rgb '#dd181f' linewidth 2"
     
     # 各アルゴリズムのデータをプロット
-    colors = ["#0060ad", "#dd181f"]  # 青と赤
+    colors = ["#0060ad", "#dd181f"]
     bandits.each_with_index do |(key, _), index|
       plot.data << Gnuplot::DataSet.new([x_values, arm0_probs[key]]) do |ds|
         ds.with = "lines"
         ds.linewidth = 2
         ds.linecolor = "rgb '#{colors[index]}'"
-        ds.title = "#{key}"
+        ds.title = key.to_s
       end
     end
   end

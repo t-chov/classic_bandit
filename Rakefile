@@ -7,6 +7,8 @@ RSpec::Core::RakeTask.new(:spec)
 
 require "rubocop/rake_task"
 
-RuboCop::RakeTask.new
+RuboCop::RakeTask.new do |task|
+  task.options = ["--config", ".rubocop.yml"] # 明示的に設定ファイルを指定
+end
 
 task default: %i[spec rubocop]
