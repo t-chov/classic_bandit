@@ -1,5 +1,8 @@
 AllCops:
   TargetRubyVersion: 3.0
+  Include:
+    - 'lib/**/*'
+    - 'spec/**/*'
 
 Style/StringLiterals:
   EnforcedStyle: double_quotes
