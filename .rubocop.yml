@@ -1,5 +1,7 @@
 AllCops:
   TargetRubyVersion: 3.0
+  Exclude:
+    - 'example/**'
 
 Style/StringLiterals:
   EnforcedStyle: double_quotes
