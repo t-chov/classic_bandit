@@ -20,7 +20,7 @@ RSpec.describe ClassicBandit::ThompsonSampling do
 
     context "when no arms have been tried" do
       it "randomly selects an arm" do
-        expect(arms).to receive(:sample)
+        expect(arms).to receive(:max_by)
         bandit.select_arm
       end
     end

@@ -14,42 +14,58 @@ module ClassicBandit
   class ThompsonSampling
     include ArmUpdatable
 
-    attr_reader :arms
+    attr_reader :arms, :alpha_prior, :beta_prior
 
-    def initialize(arms:)
+    # @param arms [Array<Arm>] Array of arms to choose from
+    # @param alpha_prior [Float] Prior parameter for successes (default: 1.0)
+    # @param beta_prior [Float] Prior parameter for failures (default: 1.0)
+    def initialize(arms:, alpha_prior: 1.0, beta_prior: 1.0)
       @arms = arms
+      @alpha_prior = alpha_prior
+      @beta_prior = beta_prior
     end
 
     def select_arm
-      return @arms.sample if @arms.all? { |arm| arm.trials.zero? }
-
       @arms.max_by { |arm| ts_score(arm) }
     end
 
     private
 
     def ts_score(arm)
-      return 0.0 if arm.trials.zero?
-      return 1.0 if arm.successes == arm.trials
+      alpha = arm.successes + @alpha_prior
+      beta = (arm.trials - arm.successes) + @beta_prior
+      
+      beta_sample(alpha, beta)
+    end
 
-      x = gamma_random(arm.successes + 1)
-      y = gamma_random(arm.trials - arm.successes + 1)
+    def beta_sample(alpha, beta)
+      # Beta(1,1) = Uniform(0,1)
+      return rand if alpha == 1.0 && beta == 1.0
+      
+      x = gamma_random(alpha)
+      y = gamma_random(beta)
       x / (x + y)
     end
 
     def gamma_random(alpha) # rubocop:disable Metrics/AbcSize
       return gamma_random(alpha + 1) * rand**(1.0 / alpha) if alpha < 1
-
-      # Marsaglia-Tsang method
+    
       d = alpha - 1.0 / 3
       c = 1.0 / Math.sqrt(9 * d)
-
+    
       loop do
-        z = normal_random
-        v = (1 + c * z)**3
+        x = normal_random
+        v = (1 + c * x)**3
+        
+        next if v <= 0
+        
         u = rand
-
-        return d * v if z > -1.0 / c && Math.log(u) < 0.5 * z * z + d * (1 - v + Math.log(v))
+        
+        # Squeeze test
+        return d * v if u < 1 - 0.0331 * x**4
+        
+        # Full test
+        return d * v if Math.log(u) < 0.5 * x * x + d - d * v + d * Math.log(v)
       end
     end
 
