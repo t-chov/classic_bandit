@@ -20,6 +20,9 @@ module ClassicBandit
     # @param alpha_prior [Float] Prior parameter for successes (default: 1.0)
     # @param beta_prior [Float] Prior parameter for failures (default: 1.0)
     def initialize(arms:, alpha_prior: 1.0, beta_prior: 1.0)
+      raise ArgumentError, "alpha_prior must be positive" unless alpha_prior.positive?
+      raise ArgumentError, "beta_prior must be positive" unless beta_prior.positive?
+
       @arms = arms
       @alpha_prior = alpha_prior
       @beta_prior = beta_prior

@@ -13,6 +13,30 @@ RSpec.describe ClassicBandit::ThompsonSampling do
       bandit = described_class.new(arms: arms)
       expect(bandit.arms).to eq(arms)
     end
+
+    it "creates instance with custom priors" do
+      bandit = described_class.new(arms: arms, alpha_prior: 2.0, beta_prior: 3.0)
+      expect(bandit.alpha_prior).to eq(2.0)
+      expect(bandit.beta_prior).to eq(3.0)
+    end
+
+    it "validates alpha_prior parameter" do
+      expect do
+        described_class.new(arms: arms, alpha_prior: -1.0)
+      end.to raise_error(ArgumentError, "alpha_prior must be positive")
+      expect do
+        described_class.new(arms: arms, alpha_prior: 0)
+      end.to raise_error(ArgumentError, "alpha_prior must be positive")
+    end
+
+    it "validates beta_prior parameter" do
+      expect do
+        described_class.new(arms: arms, beta_prior: -1.0)
+      end.to raise_error(ArgumentError, "beta_prior must be positive")
+      expect do
+        described_class.new(arms: arms, beta_prior: 0)
+      end.to raise_error(ArgumentError, "beta_prior must be positive")
+    end
   end
 
   describe "#select_arm" do
@@ -78,6 +102,21 @@ RSpec.describe ClassicBandit::ThompsonSampling do
   describe "sampling behavior" do
     let(:bandit) { described_class.new(arms: arms) }
     let(:samples) { 10_000.times.map { bandit.send(:ts_score, arms.first) } }
+
+    context "Beta(1,1) fast path" do
+      let(:bandit) { described_class.new(arms: arms, alpha_prior: 1.0, beta_prior: 1.0) }
+
+      it "uses uniform distribution for untested arms" do
+        # Arms with no trials should use Beta(1,1) = Uniform(0,1)
+        samples = 10_000.times.map { bandit.send(:beta_sample, 1.0, 1.0) }
+
+        expect(samples.all? { |s| s >= 0 && s <= 1 }).to be true
+
+        # Should be approximately uniform
+        mean = samples.sum / samples.size
+        expect(mean).to be_within(0.05).of(0.5)
+      end
+    end
 
     context "with balanced success rate" do
       before do
