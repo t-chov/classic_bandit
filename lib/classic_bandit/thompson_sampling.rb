@@ -50,6 +50,7 @@ module ClassicBandit
     def gamma_random(alpha) # rubocop:disable Metrics/AbcSize
       return gamma_random(alpha + 1) * rand**(1.0 / alpha) if alpha < 1
     
+      # Marsaglia-Tsang method
       d = alpha - 1.0 / 3
       c = 1.0 / Math.sqrt(9 * d)
     
