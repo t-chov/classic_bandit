@@ -2,19 +2,25 @@
 
 require "gnuplot"
 
-def gamma_random(alpha)
+def gamma_random(alpha) # rubocop:disable Metrics/AbcSize
   return gamma_random(alpha + 1) * rand**(1.0 / alpha) if alpha < 1
 
-  # Marsaglia-Tsang method
   d = alpha - 1.0 / 3
   c = 1.0 / Math.sqrt(9 * d)
 
   loop do
-    z = normal_random
-    v = (1 + c * z)**3
+    x = normal_random
+    v = (1 + c * x)**3
+    
+    next if v <= 0
+    
     u = rand
-
-    return d * v if z > -1.0 / c && Math.log(u) < 0.5 * z * z + d * (1 - v + Math.log(v))
+    
+    # Squeeze test
+    return d * v if u < 1 - 0.0331 * x**4
+    
+    # Full test
+    return d * v if Math.log(u) < 0.5 * x * x + d - d * v + d * Math.log(v)
   end
 end
 
