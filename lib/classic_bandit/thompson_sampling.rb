@@ -34,14 +34,14 @@ module ClassicBandit
     def ts_score(arm)
       alpha = arm.successes + @alpha_prior
       beta = (arm.trials - arm.successes) + @beta_prior
-      
+
       beta_sample(alpha, beta)
     end
 
     def beta_sample(alpha, beta)
       # Beta(1,1) = Uniform(0,1)
-      return rand if alpha == 1.0 && beta == 1.0
-      
+      return rand if alpha == 1.0 && beta == 1.0 # rubocop:disable Lint/FloatComparison
+
       x = gamma_random(alpha)
       y = gamma_random(beta)
       x / (x + y)
@@ -49,22 +49,22 @@ module ClassicBandit
 
     def gamma_random(alpha) # rubocop:disable Metrics/AbcSize
       return gamma_random(alpha + 1) * rand**(1.0 / alpha) if alpha < 1
-    
+
       # Marsaglia-Tsang method
       d = alpha - 1.0 / 3
       c = 1.0 / Math.sqrt(9 * d)
-    
+
       loop do
         x = normal_random
         v = (1 + c * x)**3
-        
+
         next if v <= 0
-        
+
         u = rand
-        
+
         # Squeeze test
         return d * v if u < 1 - 0.0331 * x**4
-        
+
         # Full test
         return d * v if Math.log(u) < 0.5 * x * x + d - d * v + d * Math.log(v)
       end
